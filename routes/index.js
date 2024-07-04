@@ -34,12 +34,16 @@ router.post('/createuser',async function(req, res) {
 });
 
 
+router.get('/dashboard', function(req, res) {
+  res.render('index');
+});
+
 router.post('/loginuser',async function(req, res) {
 
   const { email, password } = req.body;
   const existingUser = await User.findOne({ where: { email,password } });
   if (existingUser) {
-    res.render("index");
+    res.redirect("dashboard");
   }else{
     res.end("somehting went wrong");
   }
