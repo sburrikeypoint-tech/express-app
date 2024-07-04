@@ -3,9 +3,52 @@ var router = express.Router();
 const { Post } = require('../models');
 const { User } = require('../models');
 
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function(req, res) {
+  res.redirect("register");
 });
+
+router.get('/logout', function(req, res) {
+  res.redirect("login");
+});
+
+router.get('/register', function(req, res) {
+  res.render('register');
+});
+
+router.get('/login', function(req, res) {
+  res.render('login');
+});
+
+router.post('/createuser',async function(req, res) {
+ 
+  const { firstName, lastName, email, password } = req.body;
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    res.render("register",{ message: 'User already exists' });
+  }
+  const status = await User.create({ firstName, lastName, email, password });
+  if (status) {
+    res.render("login",{ message: 'User created success' });
+  }
+
+});
+
+
+router.post('/loginuser',async function(req, res) {
+
+  const { email, password } = req.body;
+  res.end(req.body.email);
+  const existingUser = await User.find({ where: { email,password } });
+  if (existingUser) {
+    res.render("index");
+  }else{
+    res.end("somehting went wrong");
+  }
+});
+
+
+
+
 
 router.get('/userposts', async function(req, res, next) {
  
