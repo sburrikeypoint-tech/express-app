@@ -37,8 +37,7 @@ router.post('/createuser',async function(req, res) {
 router.post('/loginuser',async function(req, res) {
 
   const { email, password } = req.body;
-  res.end(req.body.email);
-  const existingUser = await User.find({ where: { email,password } });
+  const existingUser = await User.findOne({ where: { email,password } });
   if (existingUser) {
     res.render("index");
   }else{
