@@ -34,10 +34,9 @@ router.post('/createuser',async function(req, res) {
 });
 
 router.post('/loginuser',async function(req, res) {
-
   const { email, password } = req.body;
-  const existingUser = await User.findOne({ where: { email,password } });
-  if (existingUser) {
+  const userdetails = await User.findOne({ where: { email,password } });
+  if (userdetails) {
     res.redirect("dashboard");
   }else{
     res.end("somehting went wrong");
@@ -61,6 +60,13 @@ router.get('/postsview/:id',async function(req, res) {
     res.render("postview",{post});
 });
 
+
+router.get('/myposts',async function(req, res) {
+  var posts = await Post.findAll({
+    attributes: ['id', 'title', 'content','userId'],
+  });
+  res.render('index',{posts});
+});
 
 
 module.exports = router;
