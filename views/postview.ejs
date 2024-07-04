@@ -29,12 +29,11 @@
     </div>
 
     <div class="content">
-      <h2>Posts List</h2>
+      <h2>Post View</h2>
 
       <div class="posts">
-          <% posts.forEach(function(post) { %>
-              <h4><a href="postsview/<%= post.id %>"><%= post.title %></a></h4>
-          <% }); %>
+            <h4><%= post.title %></h4>
+            <p><%= post.content %></p>
       </div>
       
     </div>

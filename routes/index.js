@@ -33,11 +33,6 @@ router.post('/createuser',async function(req, res) {
 
 });
 
-
-router.get('/dashboard', function(req, res) {
-  res.render('index');
-});
-
 router.post('/loginuser',async function(req, res) {
 
   const { email, password } = req.body;
@@ -49,37 +44,23 @@ router.post('/loginuser',async function(req, res) {
   }
 });
 
-
-
-
-
-router.get('/userposts', async function(req, res, next) {
- 
-  try {
-    const posts = await Post.findAll({
-      attributes: ['id', 'title', 'content', 'userId'], // Specify Post attributes
-    });
-
-    const postsWithUser = await Promise.all(posts.map(async (post) => {
-      const user = await User.findByPk(post.userId, {
-        attributes: ['firstName'], 
-      });
-      return {
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        userName: user.firstName, 
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-      };
-    }));
-
-    res.json(postsWithUser);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
+router.get('/dashboard',async function(req, res) {
+  var posts = await Post.findAll({
+    attributes: ['id', 'title', 'content','userId'],
+  });
+  res.render('index',{posts});
 });
+
+
+router.get('/postsview/:id',async function(req, res) {
+    id = req.params.id;
+    const post = await Post.findByPk(id);
+    if (post.length === 0) {
+      return res.end({message: 'No posts found' });
+    }
+    res.render("postview",{post});
+});
+
 
 
 module.exports = router;
