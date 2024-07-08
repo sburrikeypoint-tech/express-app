@@ -8,8 +8,9 @@ router.get('/', function(req, res) {
 });
 
 router.get('/logout', function(req, res) {
-  req.session.destroy();
-  res.redirect('login');
+  req.session.destroy((err) => {
+    res.redirect('/');
+  })
 });
 
 router.get('/register', function(req, res) {
@@ -88,6 +89,21 @@ router.get('/myposts',async function(req, res) {
       attributes: ['id', 'title', 'content','userId'],
     });
     res.render('index',{title:"My Posts",posts,sessionuser:req.session.user});
+  }else{
+    res.redirect('login');
+  }
+});
+
+
+router.get('/settings',async function(req, res) {
+  if(req.session.user){
+    var posts = await Post.findAll({
+      where: {
+        userId: req.session.user.id
+      },
+      attributes: ['id', 'title', 'content','userId'],
+    });
+    res.render('index',{title:"Settings",posts,sessionuser:req.session.user});
   }else{
     res.redirect('login');
   }
