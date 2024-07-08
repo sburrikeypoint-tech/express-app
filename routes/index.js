@@ -45,6 +45,12 @@ const loginValidation = [
   body('password').notEmpty().withMessage('Password is required')
 ];
 
+
+const postAddingValidation = [
+  body('title').notEmpty().withMessage('Title is required'),
+  body('description').notEmpty().withMessage('description is required')
+];
+
 router.post('/createuser',registerValidation,async function(req, res) {
 
   const errors = validationResult(req);
@@ -135,6 +141,7 @@ router.get('/deletepost/:id',async function(req, res) {
     }else{
       const status = await post.destroy();
       if (status) {
+        req.flash("success","Post deleted success");
         res.redirect("back");
       }
     }
@@ -174,17 +181,25 @@ router.get('/settings',async function(req, res) {
 });
 
 
-router.post('/creatpost',async function(req, res) {
+router.post('/creatpost',postAddingValidation,async function(req, res) {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array().map(error => error.msg));
+    return res.redirect(`myposts`);
+  }
   if(req.session.user){
     const { title, description } = req.body;
     const userId = req.session.user.id;
     const status = await Post.create({ title, content:description, userId });
     if (status) {
+      req.flash("success","Post added success");
       res.redirect("myposts");
     }
   }else{
     res.redirect('login');
   }
+  
 });
 
 module.exports = router;
