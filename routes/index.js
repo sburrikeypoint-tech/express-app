@@ -5,28 +5,28 @@ const { Post } = require('../models');
 const { User } = require('../models');
 
 router.get('/', function(req, res) {
-  res.redirect("register");
+  return res.redirect("register");
 });
 
 router.get('/logout', function(req, res) {
   req.session.destroy((err) => {
-    res.redirect('/login');
+    return res.redirect('/login');
   })
 });
 
 router.get('/register', function(req, res) {
   if(!req.session.user){
-    res.render('register');
+    return res.render('register');
   }else{
-    res.redirect("dashboard");
+    return res.redirect("dashboard");
   }
 });
 
 router.get('/login', function(req, res) {
   if(!req.session.user){
-    res.render('login');
+    return res.render('login');
   }else{
-    res.redirect("dashboard");
+    return res.redirect("dashboard");
   }
 });
 
@@ -64,13 +64,13 @@ router.post('/createuser',registerValidation,async function(req, res) {
   const existingUser = await User.findOne({ where: { email } });
   if (existingUser) {
     req.flash('error', 'user with same email already exists.');
-    res.redirect("register");
+    return res.redirect("register");
   }
 
   const status = await User.create({ firstName, lastName, email, password });
   if (status) {
     req.flash('success', 'Registration successful! Please log in.');
-    res.redirect("login");
+    return res.redirect("login");
   }
 
 });
@@ -103,84 +103,70 @@ router.post('/loginuser', loginValidation, async function(req, res) {
     
 });
 
+// menu routes
 router.get('/dashboard',async function(req, res) {
-  if(req.session.user){
-    var posts = await Post.findAll({
-      attributes: ['id', 'title', 'content','userId'],
-      order: [
-        ['id', 'desc'],
-      ],
-    });
-    res.render('dashboard',{title:"All Posts",posts,sessionuser:req.session.user});
-  }else{
+
+  if(!req.session.user){
     res.redirect('login');
   }
+
+  var posts = await Post.findAll({
+    attributes: ['id', 'title', 'content','userId'],
+    order: [
+      ['id', 'desc'],
+    ],
+  });
+  return res.render('dashboard',{title:"All Posts",posts,sessionuser:req.session.user});
+  
 });
-
-
-router.get('/postsview/:id',async function(req, res) {
-  if(req.session.user){
-    id = req.params.id;
-    const post = await Post.findByPk(id);
-    if (post.length === 0) {
-      return res.end({message: 'No posts found' });
-    }
-    res.render("postview",{post,sessionuser:req.session.user});
-  }else{
-    res.redirect('login');
-  }  
-});
-
-
-router.get('/deletepost/:id',async function(req, res) {
-  if(req.session.user){
-    id = req.params.id;
-    const post = await Post.findByPk(id);
-    if (post.length === 0) {
-      return res.end({message: 'No posts found' });
-    }else{
-      const status = await post.destroy();
-      if (status) {
-        req.flash("success","Post deleted success");
-        res.redirect("back");
-      }
-    }
-  }else{
-    res.redirect('login');
-  }  
-});
-
 
 router.get('/myposts',async function(req, res) {
-  if(req.session.user){
-    var posts = await Post.findAll({
-      where: {
-        userId: req.session.user.id
-      },
-      attributes: ['id', 'title', 'content','userId'],
-    });
-    res.render('myposts',{title:"My Posts",posts,sessionuser:req.session.user});
-  }else{
-    res.redirect('login');
+
+  if(!req.session.user){
+    return res.redirect('login');
   }
+
+  var posts = await Post.findAll({
+    where: {
+      userId: req.session.user.id
+    },
+    attributes: ['id', 'title', 'content','userId'],
+  });
+  return res.render('myposts',{title:"My Posts",posts,sessionuser:req.session.user});
+
 });
 
+router.get('/postsview/:id',async function(req, res) {
+  if(!req.session.user){
+    return res.redirect('login');
+  }  
+
+  id = req.params.id;
+  const post = await Post.findByPk(id);
+  if (post.length === 0) {
+    req.flash('success', 'No post found ');
+    res.redirect("back");
+  }
+  return res.render("postview",{post,sessionuser:req.session.user});
+
+});
 
 router.get('/settings',async function(req, res) {
-  if(req.session.user){
-    var posts = await Post.findAll({
-      where: {
-        userId: req.session.user.id
-      },
-      attributes: ['id', 'title', 'content','userId'],
-    });
-    res.render('settings',{title:"Settings",posts,sessionuser:req.session.user});
-  }else{
-    res.redirect('login');
+  if(!req.session.user){
+    return res.redirect('login');
   }
+
+  var posts = await Post.findAll({
+    where: {
+      userId: req.session.user.id
+    },
+    attributes: ['id', 'title', 'content','userId'],
+  });
+  return res.render('settings',{title:"Settings",posts,sessionuser:req.session.user});
+
 });
 
-
+// posts routes
 router.post('/creatpost',postAddingValidation,async function(req, res) {
 
   const errors = validationResult(req);
@@ -188,18 +174,86 @@ router.post('/creatpost',postAddingValidation,async function(req, res) {
     req.flash('error', errors.array().map(error => error.msg));
     return res.redirect(`myposts`);
   }
-  if(req.session.user){
-    const { title, description } = req.body;
-    const userId = req.session.user.id;
-    const status = await Post.create({ title, content:description, userId });
-    if (status) {
-      req.flash("success","Post added success");
-      res.redirect("myposts");
-    }
-  }else{
-    res.redirect('login');
+
+  if(!req.session.user){
+    return res.redirect('login');
   }
-  
+
+  const { title, description } = req.body;
+  const userId = req.session.user.id;
+  const status = await Post.create({ title, content:description, userId });
+  if (status) {
+    req.flash("success","Post added success");
+    return res.redirect("myposts");
+  }
+
+});
+
+router.get('/deletepost/:id',async function(req, res) {
+
+  if(!req.session.user){
+    return res.redirect('login');
+  }  
+
+  id = req.params.id;
+  const post = await Post.findByPk(id);
+  if (post.length === 0) {
+    req.flash('success', 'No post found ');
+    return res.redirect("back");
+  }else{
+    const status = await post.destroy();
+    if (status) {
+      req.flash("success","Post deleted success");
+      return res.redirect("back");
+    }
+  }
+
+});
+
+
+router.get('/editpost/:id',async function(req, res) {
+
+  if(!req.session.user){
+    return res.redirect('login');
+  } 
+
+  id = req.params.id;
+  const editpost = await Post.findByPk(id);
+  if (editpost.length === 0) {
+    req.flash('error', 'No post found');
+    return res.redirect("back");
+  }else{
+    return res.render('editpost',{title:"Edit Post",sessionuser:req.session.user,editpost});
+  }
+
+});
+
+
+router.post('/updatepost',postAddingValidation,async function(req, res) {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array().map(error => error.msg));
+    return res.redirect(`myposts`);
+  }
+
+  if(!req.session.user){
+    return res.redirect('login');
+  }
+
+  const { id, title, description } = req.body;
+  const post = await Post.findByPk(id);
+
+  const newdata = {};
+  if (title) newdata.title = title;
+  if (description) newdata.content = description;
+
+  const status = await post.update(newdata);
+  if (status) {
+    req.flash("success","Post updated success");
+    return res.redirect("myposts");
+  }
+ 
 });
 
 module.exports = router;
