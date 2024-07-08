@@ -9,7 +9,7 @@ router.get('/', function(req, res) {
 
 router.get('/logout', function(req, res) {
   req.session.destroy((err) => {
-    res.redirect('/');
+    res.redirect('/login');
   })
 });
 
@@ -59,7 +59,7 @@ router.get('/dashboard',async function(req, res) {
     var posts = await Post.findAll({
       attributes: ['id', 'title', 'content','userId'],
     });
-    res.render('index',{title:"All Posts",posts,sessionuser:req.session.user});
+    res.render('dashboard',{title:"All Posts",posts,sessionuser:req.session.user});
   }else{
     res.redirect('login');
   }
@@ -88,7 +88,7 @@ router.get('/myposts',async function(req, res) {
       },
       attributes: ['id', 'title', 'content','userId'],
     });
-    res.render('index',{title:"My Posts",posts,sessionuser:req.session.user});
+    res.render('myposts',{title:"My Posts",posts,sessionuser:req.session.user});
   }else{
     res.redirect('login');
   }
@@ -103,7 +103,7 @@ router.get('/settings',async function(req, res) {
       },
       attributes: ['id', 'title', 'content','userId'],
     });
-    res.render('index',{title:"Settings",posts,sessionuser:req.session.user});
+    res.render('settings',{title:"Settings",posts,sessionuser:req.session.user});
   }else{
     res.redirect('login');
   }
