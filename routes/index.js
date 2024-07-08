@@ -110,4 +110,17 @@ router.get('/settings',async function(req, res) {
 });
 
 
+router.post('/creatpost',async function(req, res) {
+  if(req.session.user){
+    const { title, description } = req.body;
+    const userId = req.session.user.id;
+    const status = await Post.create({ title, content:description, userId });
+    if (status) {
+      res.redirect("myposts");
+    }
+  }else{
+    res.redirect('login');
+  }
+});
+
 module.exports = router;
