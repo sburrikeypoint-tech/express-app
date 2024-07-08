@@ -75,6 +75,31 @@ router.post('/createuser',registerValidation,async function(req, res) {
 
 });
 
+
+router.post('/updateuser',async function(req, res) {
+  
+  const { id, firstName, lastName, email } = req.body;
+
+  const user = await User.findByPk(id);
+  if (!user) {
+    req.flash('error', 'No user account found');
+    return res.redirect("back");
+  }
+
+  const newdata = {};
+  if (firstName) newdata.firstName = firstName;
+  if (lastName) newdata.lastName = lastName;
+  if (email) newdata.email = email;
+
+  const status = await user.update(newdata);
+  req.session.user = status;
+  if(status){
+    req.flash('success', 'user details updated');
+    return res.redirect("back");
+  }
+ 
+});
+
 router.post('/loginuser', loginValidation, async function(req, res) {
 
   const errors = validationResult(req);

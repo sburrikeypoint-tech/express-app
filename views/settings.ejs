@@ -34,6 +34,44 @@
       <h2><%= title %></h2>
 
       <div class="posts">
+        <p>Profile settings</p>
+
+        <div class="errordiv">
+            <% if (error_messages.length > 0) { %>
+                <ul>
+                <% error_messages.forEach(error => { %>
+                    <li><%= error %></li>
+                <% }) %>
+                </ul>
+            <% } %>
+        </div>
+        <div class="successdiv">
+            <% if (success_messages.length > 0) { %>
+                <ul>
+                    <% success_messages.forEach(message => { %>
+                    <li><%= message %></li>
+                    <% }) %>
+                </ul>
+            <% } %>
+        </div>
+
+        <form action="/updateuser" method="post">
+            <br>
+            <label for="name">First Name:</label>
+            <input type="hidden" id="id" name="id" value="<%=sessionuser.id%>">
+            <input type="text" id="firstName" name="firstName" value="<%=sessionuser.firstName%>">
+            <br>
+            <br>
+            <label for="name">Last Name:</label>
+            <input type="text" id="lastName" name="lastName"  value="<%=sessionuser.lastName%>">
+            <br>
+            <br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"  value="<%=sessionuser.email%>">
+            <br>
+            <br>
+            <input type="submit" value="Update">
+        </form>
          
       </div>
       
