@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const { body, validationResult } = require('express-validator');
 const { Post } = require('../models');
 const { User } = require('../models');
 
@@ -29,29 +30,71 @@ router.get('/login', function(req, res) {
   }
 });
 
-router.post('/createuser',async function(req, res) {
- 
+const registerValidation = [
+  body('firstName').notEmpty().withMessage('First Name is required'),
+  body('lastName').notEmpty().withMessage('Last Name is required'),
+  body('email').notEmpty().withMessage('Email is required'),
+  body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters long'),
+  body('password').notEmpty().withMessage('Password is required')
+];
+
+
+const loginValidation = [
+  body('email').notEmpty().withMessage('Email is required'),
+  body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters long'),
+  body('password').notEmpty().withMessage('Password is required')
+];
+
+router.post('/createuser',registerValidation,async function(req, res) {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array().map(error => error.msg));
+    return res.redirect(`register`);
+  }
+
   const { firstName, lastName, email, password } = req.body;
+
   const existingUser = await User.findOne({ where: { email } });
   if (existingUser) {
-    res.render("register",{ message: 'User already exists' });
+    req.flash('error', 'user with same email already exists.');
+    res.redirect("register");
   }
+
   const status = await User.create({ firstName, lastName, email, password });
   if (status) {
-    res.render("login",{ message: 'User created success' });
+    req.flash('success', 'Registration successful! Please log in.');
+    res.redirect("login");
   }
 
 });
 
-router.post('/loginuser',async function(req, res) {
-  const { email, password } = req.body;
-  const userdetails = await User.findOne({ where: { email,password } });
-  if (userdetails) {
-    req.session.user = userdetails;
-    res.redirect("dashboard");
-  }else{
-    res.end("somehting went wrong");
+router.post('/loginuser', loginValidation, async function(req, res) {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array().map(error => error.msg));
+    return res.redirect(`login`);
   }
+  
+  const { email, password } = req.body;
+
+  const emailexist = await User.findOne({ where: { email:email } });
+  if(!emailexist){
+    req.flash('error', 'No email account found');
+    return res.redirect("login");
+  }
+
+  const userdetails = await User.findOne({ where: { email,password } });
+  if (!userdetails) {
+    req.flash('error', 'Incorrect password');
+    return res.redirect("login");
+  }
+
+  req.session.user = userdetails;
+  req.flash('success', 'Login Success');
+  return res.redirect("dashboard");
+    
 });
 
 router.get('/dashboard',async function(req, res) {

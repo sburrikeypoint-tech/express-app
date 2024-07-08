@@ -13,9 +13,39 @@
             margin: 20px;
             padding: 10px;
         }
+        .errordiv{
+            color:red;
+        }
+        .successdiv{
+            color:green;
+        }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
+
+    <div class="errordiv">
+        <% if (error_messages.length > 0) { %>
+            <ul>
+            <% error_messages.forEach(error => { %>
+                <li><%= error %></li>
+            <% }) %>
+            </ul>
+        <% } %>
+    </div>
+    <div class="successdiv">
+        <% if (success_messages.length > 0) { %>
+            <ul>
+                <% success_messages.forEach(message => { %>
+                <li><%= message %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+    </div>
 
     <span><%= sessionuser.firstName %></span>
     <div class="header">
