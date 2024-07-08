@@ -17,19 +17,21 @@
 </head>
 <body>
 
+    <span><%= sessionuser.firstName %></span>
     <div class="header">
         <h1>Dashboard </h1>
     </div>
 
     <div class="sidebar">
         <a href="/dashboard">Home</a>
-        <a href="/myposts">My posts</a>
+        <a href="/myposts">My posts </a>
         <a href="/settings">Settings</a>
         <a href="/logout">Logout</a>
     </div>
 
     <div class="content">
-      <h2>Posts List</h2>
+        
+      <h2><%= title %></h2>
 
       <div class="posts">
           <% posts.forEach(function(post) { %>

@@ -7,7 +7,7 @@ require('dotenv').config();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var postsRouter = require('./routes/posts');
-
+var session = require('express-session')
 
 const myLogger = function (req, res, next) {
   console.log('LOGGED')
@@ -16,17 +16,24 @@ const myLogger = function (req, res, next) {
 
 var app = express();
 
+app.use(session({
+  secret: 'secret234', 
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } 
+}));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', myLogger, indexRouter);
+app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 
