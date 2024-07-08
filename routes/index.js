@@ -58,6 +58,9 @@ router.get('/dashboard',async function(req, res) {
   if(req.session.user){
     var posts = await Post.findAll({
       attributes: ['id', 'title', 'content','userId'],
+      order: [
+        ['id', 'desc'],
+      ],
     });
     res.render('dashboard',{title:"All Posts",posts,sessionuser:req.session.user});
   }else{
@@ -74,6 +77,24 @@ router.get('/postsview/:id',async function(req, res) {
       return res.end({message: 'No posts found' });
     }
     res.render("postview",{post,sessionuser:req.session.user});
+  }else{
+    res.redirect('login');
+  }  
+});
+
+
+router.get('/deletepost/:id',async function(req, res) {
+  if(req.session.user){
+    id = req.params.id;
+    const post = await Post.findByPk(id);
+    if (post.length === 0) {
+      return res.end({message: 'No posts found' });
+    }else{
+      const status = await post.destroy();
+      if (status) {
+        res.redirect("back");
+      }
+    }
   }else{
     res.redirect('login');
   }  

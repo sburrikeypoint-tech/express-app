@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Dashboard</title>
     <style>
@@ -9,15 +10,19 @@
             padding: 0;
             margin: 40px;
         }
+
         .content {
             margin: 20px;
             padding: 10px;
         }
     </style>
 </head>
+
 <body>
 
-    <span><%= sessionuser.firstName %></span>
+    <span>
+        <%= sessionuser.firstName %>
+    </span>
     <div class="header">
         <h1>Dashboard </h1>
     </div>
@@ -33,26 +38,49 @@
 
         <form action="/creatpost" method="post">
             <label for="name">Title</label>
+            <br>
             <input type="text" id="title" name="title">
             <br>
             <br>
             <label for="description">Description:</label>
             <br>
-            <textarea name="description"></textarea>
+            <textarea cols="50" name="description"></textarea>
             <br>
             <br>
             <input type="submit" value="Add">
         </form>
-        
-      <h2><%= title %></h2>
 
-      <div class="posts">
-          <% posts.forEach(function(post) { %>
-              <h4><a href="postsview/<%= post.id %>"><%= post.title %></a></h4>
-          <% }); %>
-      </div>
-      
+        <h2>
+            <%= title %>
+        </h2>
+
+        <div class="posts">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let i = 1; %>
+                    <% posts.forEach(function(post) { %>
+                        <tr>
+                            <td><%= i++; %></td>
+                            <td><a href="postsview/<%= post.id %>"><%= post.title %></a></td>
+                            <td><%= post.content %></td>
+                            <td><a href="/deletepost/<%= post.id %>">delete</a></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+
+        </div>
+
     </div>
 
 </body>
+
 </html>
