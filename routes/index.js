@@ -149,7 +149,7 @@ router.get('/dashboard',async function(req, res) {
   }
 
   var posts = await Post.findAll({
-    attributes: ['id', 'title', 'content','userId'],
+    attributes: ['id', 'title', 'content','userId','image'],
     order: [
       ['id', 'desc'],
     ],
