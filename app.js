@@ -18,6 +18,7 @@ const myLogger = function (req, res, next) {
 
 var app = express();
 
+
 app.use(session({
   secret: 'secret234', 
   resave: false,
@@ -30,6 +31,8 @@ app.use(flash());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(logger('dev'));
 app.use(express.json());

@@ -1,8 +1,21 @@
 var express = require('express');
+const multer = require('multer');
+const path = require('path');
 var router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { Post } = require('../models');
 const { User } = require('../models');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../uploads/'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
 router.get('/', function(req, res) {
   return res.redirect("register");
@@ -155,7 +168,7 @@ router.get('/myposts',async function(req, res) {
     where: {
       userId: req.session.user.id
     },
-    attributes: ['id', 'title', 'content','userId'],
+    attributes: ['id', 'title', 'content','userId','image'],
   });
   return res.render('myposts',{title:"My Posts",posts,sessionuser:req.session.user});
 
@@ -192,7 +205,7 @@ router.get('/settings',async function(req, res) {
 });
 
 // posts routes
-router.post('/creatpost',postAddingValidation,async function(req, res) {
+router.post('/creatpost',upload.single('image'),postAddingValidation,async function(req, res) {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -205,8 +218,9 @@ router.post('/creatpost',postAddingValidation,async function(req, res) {
   }
 
   const { title, description } = req.body;
+  const image = req.file ? req.file.filename : null;
   const userId = req.session.user.id;
-  const status = await Post.create({ title, content:description, userId });
+  const status = await Post.create({ title, content:description,image, userId });
   if (status) {
     req.flash("success","Post added success");
     return res.redirect("myposts");

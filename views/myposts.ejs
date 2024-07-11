@@ -47,10 +47,13 @@
 
     <div class="content">
 
-        <form action="/creatpost" method="post">
+        <form action="/creatpost" method="post" enctype="multipart/form-data">
             <label for="name">Title</label>
             <br>
             <input type="text" id="title" name="title">
+            <br>
+            <br>
+            <input type="file" id="image" name="image">
             <br>
             <br>
             <label for="description">Description:</label>
@@ -91,6 +94,7 @@
                         <th>Id</th>
                         <th>Title</th>
                         <th>Content</th>
+                        <th>Image</th>
                         <th>Action</th>
                         <th>Action</th>
                     </tr>
@@ -102,6 +106,7 @@
                             <td><%= i++; %></td>
                             <td><a href="postsview/<%= post.id %>"><%= post.title %></a></td>
                             <td><%= post.content %></td>
+                            <td><img width="100" src="../uploads/<%=post.image%>"></td>
                             <td><a href="/deletepost/<%= post.id %>">delete</a></td>
                             <td><a href="/editpost/<%= post.id %>">edit</a></td>
                         </tr>
