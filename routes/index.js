@@ -5,6 +5,7 @@ var router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { Post } = require('../models');
 const { User } = require('../models');
+const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -240,6 +241,13 @@ router.get('/deletepost/:id',async function(req, res) {
     req.flash('success', 'No post found ');
     return res.redirect("back");
   }else{
+    fs.unlink("./uploads/"+post.image, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('File is deleted.');
+      }
+    });
     const status = await post.destroy();
     if (status) {
       req.flash("success","Post deleted success");
